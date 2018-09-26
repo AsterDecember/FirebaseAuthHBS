@@ -1,0 +1,48 @@
+<h1>{{title}}</h1>
+<p>Welcome to {{title}}</p>
+
+<button id="button">Login</button>
+
+<script src="https://www.gstatic.com/firebasejs/5.5.1/firebase.js"></script>
+<script>
+  var config = {
+    apiKey: "AIzaSyCwBNQbF1AdwhQHuntvLxsXSjqlGjac8rg",
+    authDomain: "sahadad-5e92c.firebaseapp.com",
+    databaseURL: "https://sahadad-5e92c.firebaseio.com",
+    projectId: "sahadad-5e92c",
+    storageBucket: "sahadad-5e92c.appspot.com",
+    messagingSenderId: "422406853035"
+  };
+
+document.getElementById('button').addEventListener('click', () => {
+  firebase.initializeApp(config);
+  var provider = new firebase.auth.FacebookAuthProvider();
+  firebase.auth().signInWithPopup(provider)
+  .then(function(result) {
+    var token = result.credential.accessToken;
+    var user = result.user;
+    console.log(user)
+    const createUser = (body) => {
+      return fetch('http://localhost:3000/create', {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      })  
+    }
+    createUser({username: user.displayName, email: user.email, photoURL: user.photoURL})
+    .then(result => {
+      window.location.href= '/profile' 
+    })
+    .catch(error => console.log(error))
+  })
+  .catch(function(error) {
+    var errorCode = error.code;
+    var errorMessage = error.message;
+    var email = error.email;
+    var credential = error.credential;
+});
+})
+
+</script>
